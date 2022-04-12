@@ -7,6 +7,12 @@
 
 import UIKit
 
-class UIView_Extension: NSObject {
-
+extension UIView {
+    func dropShadowEffect() {
+        layer.shadowColor = UIColor.lightGray.cgColor
+        layer.shadowOpacity = 0.2
+        layer.shadowOffset = CGSize(width: 0, height: 0)
+        layer.shadowRadius = 3
+        layer.cornerRadius = 11
+    }
 }

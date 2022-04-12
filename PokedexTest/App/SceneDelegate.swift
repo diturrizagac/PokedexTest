@@ -20,7 +20,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(windowScene: windowScene)
         guard let window = window else { return }
         let loader = ApplicationLoader(window: window)
-        loder.build()
+        loader.build()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

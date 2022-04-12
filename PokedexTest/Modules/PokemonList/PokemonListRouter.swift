@@ -7,6 +7,19 @@
 
 import UIKit
 
-class PokemonListRouter: NSObject {
+final class PokemonListRouter: PokemonListRoutable {
+    var navigationController: UINavigationController
+    private let moduleFactory: ModuleFactoryProtocol
+    
+    init(navigationController: UINavigationController = UINavigationController(),
+         moduleFactory: ModuleFactoryProtocol = ModuleFactory()) {
+        self.navigationController = navigationController
+        self.moduleFactory = moduleFactory
+    }
+}
 
+extension PokemonListRouter: PokemonListRouterNavigable {
+    func showPokemonDetail() {
+        
+    }
 }

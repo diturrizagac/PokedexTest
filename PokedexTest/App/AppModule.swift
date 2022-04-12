@@ -18,7 +18,8 @@ protocol ModuleFactoryProtocol {
 
 struct ModuleFactory: ModuleFactoryProtocol {
     func makePokemonList(with navigationController: UINavigationController) -> PokemonListModule {
-        return PokemonListModule()
+        let router = PokemonListRouter(navigationController: navigationController, moduleFactory: self)
+        return PokemonListModule(router: router)
     }
     
     func makePokemDetail(with navigationController: UINavigationController) -> PokemonDetailModule {

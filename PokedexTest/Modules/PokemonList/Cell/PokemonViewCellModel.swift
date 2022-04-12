@@ -7,6 +7,12 @@
 
 import UIKit
 
-class PokemonViewCellModel: NSObject {
-
+struct PokemonViewCellModel: Hashable {
+    let titleText: String
+    let type: String
+    var image: UIImage?
+    
+    mutating func updateImage(image: UIImage?) {
+        self.image = image
+    }
 }
