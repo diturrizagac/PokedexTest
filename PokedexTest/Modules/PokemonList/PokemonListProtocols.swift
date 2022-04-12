@@ -7,7 +7,6 @@
 
 import UIKit
 
-
 // MARK: Router
 typealias PokemonListRouterProtocol = PokemonListRoutable & PokemonListRouterNavigable
 
@@ -70,6 +69,7 @@ protocol PokemonListPresenterServiceHandler: AnyObject {
 }
 
 protocol PokemonListPresenterActionable: AnyObject {
+    func didSearchActive(with text: String)
     func didSelectCell(at index: Int)
 }
 
@@ -79,11 +79,11 @@ typealias PokemonListInteractorProtocol = PokemonListInteractable & PokemonListI
 
 protocol PokemonListInteractable: AnyObject {
     var presenter: PokemonListPresenterProtocol? { get set }
-    
-    var modelDictionary: [Int:PokemonViewCellModel] { get set }
-    var pokemonDictionary: [Int:PokemonListResponse] { get set }
 }
 
-protocol PokemonListInteractorServiceHander: AnyObject {
+protocol PokemonListInteractorServiceHander: AnyObject {    
+    var pokemonList: [PokemonModel] { get set }
+    var cachePokemonList: [PokemonModel] { get set }
+    
     func loadPokemons()
 }

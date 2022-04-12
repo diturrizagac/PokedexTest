@@ -36,11 +36,15 @@ extension PokemonListPresenter: PokemonListPresenterViewConfiguration {
 
 extension PokemonListPresenter: PokemonListDataSource {
     var numberOfRows: Int {
-        return interactor.modelDictionary.count
+        return interactor.pokemonList.count
     }
     
     func cellModel(at index: Int) -> PokemonViewCellModel? {
-        return interactor.modelDictionary[index]
+        let pokemon = interactor.pokemonList[index]
+        let model = PokemonViewCellModel(titleText: pokemon.name,
+                                         type: pokemon.type,
+                                         image: pokemon.image)
+        return model
     }
 }
 
@@ -52,6 +56,7 @@ extension PokemonListPresenter: PokemonListPresenterServiceInteractable {
 
 extension PokemonListPresenter: PokemonListPresenterServiceHandler {
     func fetchServiceSuccess() {
+        interactor.cachePokemonList = interactor.pokemonList
         view?.reloadData()
     }
     
@@ -61,6 +66,22 @@ extension PokemonListPresenter: PokemonListPresenterServiceHandler {
 }
 
 extension PokemonListPresenter: PokemonListPresenterActionable {
+    func didSearchActive(with text: String) {
+        interactor.pokemonList = interactor.cachePokemonList
+        guard !text.isEmpty else {
+            view?.reloadData()
+            return
+        }
+        let listFiltered = interactor.pokemonList.filter({
+            $0.name.contains(text.lowercased())
+        })
+        
+        if !listFiltered.isEmpty {
+            interactor.pokemonList = listFiltered
+            view?.reloadData()
+        }
+    }
+    
     func didSelectCell(at index: Int) {
         router.showPokemonDetail()
     }

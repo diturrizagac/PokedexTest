@@ -11,6 +11,16 @@ class PokemonListView: UIViewController, PokemonListViewable {
     // MARK: - Properties
     var presenter: PokemonListPresenterProtocol?
     
+    private lazy var searchBar: UISearchBar = {
+        let searchBar = UISearchBar()
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.delegate = self
+        searchBar.placeholder = "Search your pokemon"
+        searchBar.barStyle = .default
+        searchBar.sizeToFit()
+        return searchBar
+    }()
+    
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -26,7 +36,12 @@ class PokemonListView: UIViewController, PokemonListViewable {
     private var staticConstraints: [NSLayoutConstraint] {
         var constraints = [NSLayoutConstraint]()
         constraints.append(contentsOf: [
-            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+        ])
+        constraints.append(contentsOf: [
+            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
@@ -49,6 +64,7 @@ class PokemonListView: UIViewController, PokemonListViewable {
 // MARK: - Configuration
 extension PokemonListView: PokemonListViewConfigurable {
     func addViews() {
+        view.addSubview(searchBar)
         view.addSubview(collectionView)
     }
     
@@ -114,5 +130,11 @@ extension PokemonListView: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let width = (view.frame.width - 36)/2
         return CGSize(width: width, height: width/1.5)
+    }
+}
+
+extension PokemonListView: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        presenter?.didSearchActive(with: searchText)
     }
 }

@@ -11,24 +11,28 @@ class PokemonListInteractor: PokemonListInteractable {
     
     weak var presenter: PokemonListPresenterProtocol?
     
-    var modelDictionary: [Int:PokemonViewCellModel]
-    var pokemonDictionary: [Int:PokemonListResponse]
+    var pokemonList: [PokemonModel]
+    var cachePokemonList: [PokemonModel]
+    
     private let quantity: Int
     
-    init(modelDictionary: [Int:PokemonViewCellModel] = [:],
-         pokemonDictionary: [Int:PokemonListResponse] = [:],
+    init(pokemonList: [PokemonModel] = [],
          quantity: Int = 151) {
-        self.modelDictionary = modelDictionary
-        self.pokemonDictionary = pokemonDictionary
+        self.pokemonList = pokemonList
+        self.cachePokemonList = pokemonList
         self.quantity = quantity
     }
     
-    private func setupPokemon(pokemon: PokemonListResponse, index: Int) {
-        let model = PokemonViewCellModel(titleText: pokemon.name,
-                                         type: pokemon.types.first?.type.name ?? "",
-                                         image: nil)
-        modelDictionary[index-1] = model
-        pokemonDictionary[index-1] = pokemon
+    private func appendPokemon(pokemon: PokemonListResponse, pokemonImage: UIImage?){
+        let pokemonModel = PokemonModel(response: pokemon, pokemonImage: pokemonImage)
+        pokemonList.append(pokemonModel)
+    }
+    
+    private func sortList() {
+        pokemonList.sort {
+            $0.id < $1.id
+        }
+        cachePokemonList = pokemonList
     }
 }
 
@@ -40,12 +44,10 @@ extension PokemonListInteractor: PokemonListInteractorServiceHander {
             CallPokemonList(path: id).execute(
                 onSuccess: { [weak self] pokemon in
                     guard let weakSelf = self else { return }
-                    weakSelf.setupPokemon(pokemon: pokemon, index: id)
                     dispatchGroup.enter()
-                    let imageUrl = self?.pokemonDictionary[id-1]?.sprites.front_default
-                    
-                    CallPokemonImage(url: imageUrl ?? "").execute(completion: { [weak self] responseImage in
-                        self?.modelDictionary[id-1]?.updateImage(image: responseImage)
+                    let imageUrl = pokemon.sprites.front_default
+                    CallPokemonImage(url: imageUrl).execute(completion: { responseImage in
+                        weakSelf.appendPokemon(pokemon: pokemon, pokemonImage: responseImage)
                         dispatchGroup.leave()
                     })
                     dispatchGroup.leave()
@@ -59,6 +61,7 @@ extension PokemonListInteractor: PokemonListInteractorServiceHander {
         
         dispatchGroup.notify(queue: .main, execute: { [weak self] in
             guard let weakSelf = self else { return }
+            weakSelf.sortList()
             weakSelf.presenter?.fetchServiceSuccess()
         })
     }

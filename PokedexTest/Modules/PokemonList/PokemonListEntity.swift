@@ -35,7 +35,23 @@ struct CallPokemonImage: ResponseDispatcher {
     }
 }
 
+struct PokemonModel {
+    var id: Int
+    var name: String
+    var type: String
+    var image: UIImage?
+    
+    init(response: PokemonListResponse,
+         pokemonImage: UIImage?) {
+        id = response.id
+        name = response.name
+        type = response.types.first?.type.name ?? ""
+        image = pokemonImage
+    }
+}
+
 struct PokemonListResponse: Codable, Hashable {
+    var id: Int
     var name: String
     var types: [Types]
     var sprites: Sprites
